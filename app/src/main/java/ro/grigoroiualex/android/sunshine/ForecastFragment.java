@@ -1,5 +1,6 @@
 package ro.grigoroiualex.android.sunshine;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -51,7 +52,7 @@ public class ForecastFragment extends Fragment {
             case R.id.action_refresh:
                 FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
 
-                fetchWeatherTask.execute();
+                fetchWeatherTask.execute("London");
 
                 return true;
 
@@ -84,6 +85,8 @@ public class ForecastFragment extends Fragment {
     }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String> {
+        private final String DEFAULT_CITY = "Ramnicu Valcea";
+
         @Override
         protected String doInBackground(String... params) {
             // These two need to be declared outside the try/catch
@@ -93,14 +96,34 @@ public class ForecastFragment extends Fragment {
 
             // Will contain the raw JSON response as a string.
             String forecastJsonStr;
+            String city;
+
+            if (params.length > 0) {
+                city = params[0];
+            } else {
+                city = DEFAULT_CITY;
+            }
 
             try {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                String baseUrl = "http://api.openweathermap.org/data/2.5/forecast/daily?id=668872&mode=json&units=metric&cnt=7";
-                String apiKey = "&APPID=" + BuildConfig.OPEN_WEATHER_MAP_API_KEY;
-                URL url = new URL(baseUrl.concat(apiKey));
+                Uri.Builder uri = new Uri.Builder();
+                uri.scheme("http")
+                        .authority("api.openweathermap.org")
+                        .appendPath("data")
+                        .appendPath("2.5")
+                        .appendPath("forecast")
+                        .appendPath("daily")
+                        .appendQueryParameter("q", city)
+                        .appendQueryParameter("mode", "json")
+                        .appendQueryParameter("units", "metric")
+                        .appendQueryParameter("cnt", "7")
+                        .appendQueryParameter("APPID", BuildConfig.OPEN_WEATHER_MAP_API_KEY);
+
+                URL url = new URL(uri.build().toString());
+
+                Log.v(LOG_TAG, url.toString());
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
