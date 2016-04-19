@@ -1,5 +1,6 @@
 package ro.grigoroiualex.android.sunshine;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,9 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class DetailActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,7 +19,7 @@ public class DetailActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.detail_container, new PlaceholderFragment())
                     .commit();
         }
     }
@@ -58,6 +59,10 @@ public class DetailActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
 
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+            TextView textView = (TextView) rootView.findViewById(R.id.detail_text_placeholder);
+            textView.setText(getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT));
+
             return rootView;
         }
     }
